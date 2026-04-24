@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SM Availability — Pandora 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f0f4ff;
+    --surface: #ffffff;
+    --border: #d0d8f0;
+    --text: #1a1f3a;
+    --muted: #7a85a8;
+    --purple: #6c5ce7;
+    --pink: #fd79a8;
+    --teal: #00cec9;
+    --green: #00b894;
+    --coral: #ff7675;
+    --yellow: #fdcb6e;
+    --holiday: #e84393;
+    --leave: #f39c12;
+    --leave-bg: rgba(243,156,18,0.18);
+    --holiday-bg: rgba(232,67,147,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    padding: 16px 32px;
+    background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 55%, #fd79a8 100%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    gap: 20px;
+    box-shadow: 0 4px 20px rgba(108,92,231,0.3);
+  }
+
+  .logo-area { display: flex; align-items: center; gap: 14px; }
+
+  .pandora-mark {
+    font-weight: 900; font-size: 12px; letter-spacing: 0.15em;
+    text-transform: uppercase; color: white;
+    background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px;
+  }
+
+  h1 { font-weight: 800; font-size: 19px; color: white; }
+
+  .header-right { display: flex; align-items: center; gap: 10px; }
+
+  .sync-status {
+    font-size: 11px; color: rgba(255,255,255,0.85);
+    display: flex; align-items: center; gap: 6px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .sync-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: #55efc4;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%,100%{opacity:1;transform:scale(1);}
+    50%{opacity:0.6;transform:scale(0.85);}
+  }
+
+  .btn {
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 13px;
+    padding: 7px 16px; border-radius: 20px; cursor: pointer;
+    border: 2px solid rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.15); color: white; transition: all 0.2s;
+  }
+
+  .btn:hover { background: rgba(255,255,255,0.3); }
+  .btn-white { background: white; color: var(--purple); border-color: white; }
+  .btn-white:hover { background: #f0eeff; color: var(--purple); }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex; gap: 0;
+    background: var(--surface);
+    border-bottom: 2px solid var(--border);
+    padding: 0 32px;
+    box-shadow: 0 2px 8px rgba(108,92,231,0.07);
+  }
+
+  .tab-btn {
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 13px;
+    padding: 14px 22px; cursor: pointer; border: none;
+    background: transparent; color: var(--muted); transition: all 0.2s;
+    border-bottom: 3px solid transparent; margin-bottom: -2px;
+  }
+
+  .tab-btn:hover { color: var(--purple); }
+  .tab-btn.active { color: var(--purple); border-bottom-color: var(--purple); }
+
+  /* ── MONTH NAV ── */
+  .month-nav {
+    display: flex; gap: 6px; padding: 12px 32px;
+    background: var(--surface); border-bottom: 2px solid var(--border);
+    overflow-x: auto; scrollbar-width: none;
+  }
+
+  .month-nav::-webkit-scrollbar { display: none; }
+
+  .month-btn {
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 12px;
+    padding: 6px 16px; border-radius: 16px; cursor: pointer;
+    border: 2px solid transparent; background: var(--bg);
+    color: var(--muted); transition: all 0.2s; white-space: nowrap;
+  }
+
+  .month-btn:hover { color: var(--purple); border-color: var(--purple); background: #f0eeff; }
+  .month-btn.active { background: var(--purple); color: white; border-color: var(--purple); box-shadow: 0 3px 10px rgba(108,92,231,0.35); }
+
+  /* ── STATS BAR ── */
+  .stats-bar { display: flex; background: var(--surface); border-bottom: 2px solid var(--border); }
+
+  .stat { flex: 1; padding: 12px 24px; border-right: 2px solid var(--border); }
+  .stat:last-child { border-right: none; }
+  .stat-label { font-size: 10px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+  .stat-value { font-size: 24px; font-weight: 900; color: var(--text); line-height: 1.1; }
+  .stat-value.purple { color: var(--purple); }
+  .stat-value.coral { color: var(--coral); }
+  .stat-value.green { color: var(--green); }
+
+  /* ── TOOLBAR ── */
+  .toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 32px; background: var(--surface);
+    border-bottom: 2px solid var(--border); gap: 16px; flex-wrap: wrap;
+  }
+
+  .legend { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+
+  .legend-item {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--muted); font-weight: 600;
+  }
+
+  .legend-dot { width: 12px; height: 12px; border-radius: 4px; }
+
+  .add-member-form { display: flex; gap: 8px; align-items: center; }
+
+  .add-input {
+    font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 600;
+    padding: 7px 14px; border-radius: 16px; border: 2px solid var(--border);
+    background: var(--bg); color: var(--text); outline: none;
+    transition: border-color 0.2s; width: 200px;
+  }
+
+  .add-input:focus { border-color: var(--purple); }
+  .add-input::placeholder { color: var(--muted); font-weight: 400; }
+
+  .btn-add {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 13px;
+    padding: 7px 18px; border-radius: 16px; border: none;
+    background: linear-gradient(135deg, var(--green), var(--teal));
+    color: white; cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 3px 10px rgba(0,184,148,0.3);
+  }
+
+  .btn-add:hover { transform: translateY(-1px); box-shadow: 0 5px 15px rgba(0,184,148,0.4); }
+
+  /* ── CALENDAR ── */
+  .calendar-wrap { overflow-x: auto; padding: 20px 32px 60px; }
+
+  table { border-collapse: separate; border-spacing: 0; min-width: 100%; font-size: 11px; }
+
+  th.name-col, td.name-col {
+    position: sticky; left: 0; background: var(--bg); z-index: 10; min-width: 190px;
+  }
+
+  th {
+    padding: 8px 4px; text-align: center; color: var(--muted); font-weight: 700;
+    border-bottom: 2px solid var(--border); white-space: nowrap;
+  }
+
+  th.name-col { text-align: left; padding-left: 0; font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; }
+  th.day-header { min-width: 28px; max-width: 28px; font-size: 10px; }
+  th.day-header.weekend { color: #c0c8e0; }
+  th.day-header.holiday-header { color: var(--holiday); }
+  th.day-header.today-header { color: var(--teal); font-weight: 900; }
+
+  td {
+    padding: 3px 2px; text-align: center; vertical-align: middle;
+    border-bottom: 1px solid rgba(108,92,231,0.06);
+  }
+
+  td.name-col { padding: 3px 12px 3px 0; text-align: left; white-space: nowrap; }
+
+  tr:hover td.name-col { background: #ede9ff; }
+  tr:hover td.name-col .person-name { color: var(--purple); }
+
+  .name-wrap { display: flex; align-items: center; gap: 6px; }
+  .person-name { font-size: 12px; font-weight: 700; color: var(--text); transition: color 0.15s; }
+
+  .manager-badge {
+    font-size: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em;
+    color: white; background: linear-gradient(135deg, var(--purple), var(--pink));
+    padding: 2px 6px; border-radius: 8px; white-space: nowrap;
+  }
+
+  .btn-remove {
+    font-size: 11px; background: none; border: none; color: var(--muted);
+    cursor: pointer; padding: 1px 5px; border-radius: 6px;
+    opacity: 0; transition: all 0.15s; line-height: 1; margin-left: auto;
+  }
+
+  tr:hover .btn-remove { opacity: 1; }
+  .btn-remove:hover { background: #ffe0e8; color: var(--coral); }
+
+  .day-cell {
+    width: 24px; height: 24px; border-radius: 6px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto; transition: all 0.15s; position: relative; font-size: 11px;
+  }
+
+  .day-cell.workday { background: rgba(108,92,231,0.08); }
+  .day-cell.workday:hover { background: rgba(108,92,231,0.22); transform: scale(1.15); }
+  .day-cell.weekend { background: transparent; cursor: default; opacity: 0.2; }
+  .day-cell.holiday { background: var(--holiday-bg); cursor: default; }
+  .day-cell.on-leave { background: var(--leave-bg); }
+  .day-cell.on-leave::after { content:'✈'; font-size:11px; position:absolute; color:var(--leave); }
+  .day-cell.today-cell { box-shadow: inset 0 0 0 2px var(--teal); background: rgba(0,206,201,0.1); }
+
+  .holiday-label {
+    font-size: 8px; color: var(--holiday); text-align: center; margin-top: 1px;
+    line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    max-width: 28px; font-weight: 700;
+  }
+
+  tr.summary-row td { padding: 6px 2px 2px; border-top: 2px solid var(--border); background: var(--surface); }
+  tr.summary-row td.name-col { background: var(--surface); }
+
+  .avail-bar {
+    width: 24px; height: 24px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto; font-size: 8px; font-weight: 800; color: white;
+  }
+
+  .avail-full { background: linear-gradient(135deg, #00b894, #00cec9); }
+  .avail-partial { background: linear-gradient(135deg, #fdcb6e, #e17055); color: #5d3a00; }
+  .avail-none { background: linear-gradient(135deg, #ff7675, #c0392b); }
+  .avail-off { background: transparent; }
+
+  /* ── YEAR OVERVIEW ── */
+  #yearView { padding: 24px 32px 60px; }
+
+  .year-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 20px;
+  }
+
+  .mini-month {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 2px 12px rgba(108,92,231,0.08);
+    border: 2px solid var(--border);
+  }
+
+  .mini-month-title {
+    font-weight: 900; font-size: 14px; color: var(--purple);
+    margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .mini-month-title span { font-size: 11px; color: var(--muted); font-weight: 600; }
+
+  .mini-table { width: 100%; border-collapse: collapse; font-size: 10px; }
+
+  .mini-table th {
+    padding: 3px 2px; font-size: 9px; font-weight: 700; color: var(--muted);
+    text-align: center; border-bottom: 1px solid var(--border); letter-spacing: 0.04em;
+  }
+
+  .mini-table th.name-th {
+    text-align: left; font-size: 9px; min-width: 110px;
+    position: sticky; left: 0; background: var(--surface);
+  }
+
+  .mini-table td { padding: 2px 1px; text-align: center; vertical-align: middle; }
+
+  .mini-table td.name-td {
+    text-align: left; white-space: nowrap; font-size: 10px; font-weight: 700;
+    color: var(--text); padding-right: 6px;
+    position: sticky; left: 0; background: var(--surface);
+    max-width: 110px; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .mini-cell {
+    width: 16px; height: 16px; border-radius: 3px;
+    margin: 0 auto; display: flex; align-items: center; justify-content: center;
+    font-size: 8px; cursor: pointer; transition: all 0.1s;
+  }
+
+  .mini-cell.workday { background: rgba(108,92,231,0.08); }
+  .mini-cell.workday:hover { background: rgba(108,92,231,0.25); transform: scale(1.2); }
+  .mini-cell.weekend { background: transparent; cursor: default; opacity: 0.15; }
+  .mini-cell.holiday { background: rgba(232,67,147,0.15); cursor: default; }
+  .mini-cell.on-leave { background: rgba(243,156,18,0.25); }
+  .mini-cell.on-leave::after { content:'·'; color: var(--leave); font-weight: 900; font-size: 12px; line-height: 0; }
+  .mini-cell.today-mini { box-shadow: inset 0 0 0 1px var(--teal); }
+
+  .mini-avail-row td { border-top: 1px solid var(--border); padding: 2px 1px; }
+
+  .mini-avail {
+    width: 16px; height: 16px; border-radius: 3px;
+    margin: 0 auto; display: flex; align-items: center; justify-content: center;
+    font-size: 7px; font-weight: 800; color: white;
+  }
+
+  .mini-avail.full { background: var(--green); }
+  .mini-avail.partial { background: var(--yellow); color: #5d3a00; }
+  .mini-avail.low { background: var(--coral); }
+  .mini-avail.off { background: transparent; }
+
+  .year-stats {
+    display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;
+  }
+
+  .year-stat {
+    background: var(--surface); border-radius: 12px; padding: 12px 20px;
+    border: 2px solid var(--border); flex: 1; min-width: 140px;
+  }
+
+  .year-stat-label { font-size: 10px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+  .year-stat-value { font-size: 22px; font-weight: 900; }
+  .year-stat-value.purple { color: var(--purple); }
+  .year-stat-value.coral { color: var(--coral); }
+  .year-stat-value.teal { color: var(--teal); }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(26,31,58,0.45); backdrop-filter: blur(4px);
+    z-index: 500; align-items: center; justify-content: center;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: white; border-radius: 20px; padding: 32px;
+    max-width: 400px; width: 90%;
+    box-shadow: 0 20px 60px rgba(108,92,231,0.2);
+  }
+
+  .modal h2 { font-size: 20px; font-weight: 900; margin-bottom: 8px; }
+  .modal p { font-size: 13px; color: var(--muted); margin-bottom: 24px; font-weight: 600; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+  .btn-modal-cancel {
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 13px;
+    padding: 10px 20px; border-radius: 12px; border: 2px solid var(--border);
+    background: var(--bg); color: var(--muted); cursor: pointer;
+  }
+
+  .btn-modal-confirm {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 13px;
+    padding: 10px 24px; border-radius: 12px; border: none;
+    background: linear-gradient(135deg, #ff7675, #e17055);
+    color: white; cursor: pointer;
+    box-shadow: 0 4px 12px rgba(255,118,117,0.35);
+  }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--text); color: white;
+    padding: 12px 20px; border-radius: 12px;
+    font-size: 13px; font-weight: 700;
+    opacity: 0; transform: translateY(8px);
+    transition: all 0.25s; z-index: 999; pointer-events: none;
+    box-shadow: 0 8px 24px rgba(26,31,58,0.2);
+  }
+
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-area">
+    <div class="pandora-mark">Pandora</div>
+    <h1>✨ SM Availability 2026</h1>
+  </div>
+  <div class="header-right">
+    <div class="sync-status">
+      <div class="sync-dot" id="syncDot"></div>
+      <span id="syncLabel">Loading...</span>
+    </div>
+    <button class="btn" onclick="loadFromSheets()">⟳ Load</button>
+    <button class="btn btn-white" onclick="saveToSheets()">💾 Save</button>
+  </div>
+</header>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('month')">📅 Monthly View</button>
+  <button class="tab-btn" onclick="switchTab('year')">🗓️ Year Overview</button>
+</div>
+
+<!-- MONTHLY VIEW -->
+<div id="monthView">
+  <div class="month-nav" id="monthNav"></div>
+
+  <div class="stats-bar">
+    <div class="stat">
+      <div class="stat-label">Team Members</div>
+      <div class="stat-value purple" id="statTotal">19</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">On Leave Today</div>
+      <div class="stat-value coral" id="statLeave">0</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Available Today</div>
+      <div class="stat-value green" id="statAvail">19</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Month</div>
+      <div class="stat-value" id="statMonth">—</div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-dot" style="background:rgba(108,92,231,0.12);border:2px solid rgba(108,92,231,0.35)"></div>
+        Workday — click to mark leave
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:rgba(243,156,18,0.2);border:2px solid #f39c12"></div>
+        ✈ On Leave
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:rgba(232,67,147,0.15);border:2px solid #e84393"></div>
+        Public Holiday
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:rgba(0,206,201,0.15);border:2px solid #00cec9"></div>
+        Today
+      </div>
+    </div>
+    <div class="add-member-form">
+      <input class="add-input" id="newMemberInput" type="text" placeholder="Add new member..." onkeydown="if(event.key==='Enter') addMember()" />
+      <button class="btn-add" onclick="addMember()">+ Add</button>
+    </div>
+  </div>
+
+  <div class="calendar-wrap">
+    <table id="calTable">
+      <thead id="calHead"></thead>
+      <tbody id="calBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- YEAR OVERVIEW -->
+<div id="yearView" class="hidden">
+  <div class="year-stats">
+    <div class="year-stat">
+      <div class="year-stat-label">Team Members</div>
+      <div class="year-stat-value purple" id="yStat1">19</div>
+    </div>
+    <div class="year-stat">
+      <div class="year-stat-label">Total Leave Days Logged</div>
+      <div class="year-stat-value coral" id="yStat2">0</div>
+    </div>
+    <div class="year-stat">
+      <div class="year-stat-label">Public Holidays (DK)</div>
+      <div class="year-stat-value teal" id="yStat3">14</div>
+    </div>
+    <div class="year-stat">
+      <div class="year-stat-label">Working Days 2026</div>
+      <div class="year-stat-value" id="yStat4">254</div>
+    </div>
+  </div>
+  <div class="year-grid" id="yearGrid"></div>
+</div>
+
+<!-- Remove modal -->
+<div class="modal-overlay" id="removeModal">
+  <div class="modal">
+    <h2>Remove member 🗑️</h2>
+    <p id="removeModalText">Are you sure you want to remove this person?</p>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-modal-confirm" onclick="confirmRemove()">Remove</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────
+const PROXY_URL = 'https://script.google.com/macros/s/AKfycbzKZycM8lxvENB1x3ZQfhOorKkBfkLAKKCQhgzrUDqb1kanXL7dUPdQDastQ5K3gA7V/exec';
+
+let SCRUM_MASTERS = [
+  'Donika Pavlova-Bjørnsten','Monal Yadav','Anne Bjergstad','Olga Sarnowska',
+  'Joana Neves','Tina Willendrup','Simon Lejbach','Magda Mijal',
+  'Saravana Karthikeyan','Beatrix Hideg','Katarzyna Checko','Andrei Tsimashevich',
+  'Jeppe Søndberg','Norbert Sunega','Olimpia Owczarek','Josefine Bowring',
+  'Suleman Malik','Linda Huynh','Abhijit Ray',
+];
+
+const BASE_MANAGERS = ['Donika Pavlova-Bjørnsten','Katarzyna Checko','Abhijit Ray'];
+let MANAGERS = [...BASE_MANAGERS];
+
+const HOLIDAYS = {
+  '2026-01-01':'New Year\'s Day','2026-04-02':'Maundy Thursday','2026-04-03':'Good Friday',
+  '2026-04-05':'Easter Sunday','2026-04-06':'Easter Monday','2026-05-14':'Ascension Day',
+  '2026-05-24':'Whit Sunday','2026-05-25':'Whit Monday','2026-12-25':'Christmas Day',
+  '2026-12-26':'Boxing Day','2026-05-01':'Labour Day','2026-06-05':'Constitution Day',
+  '2026-12-24':'Christmas Eve','2026-12-31':'New Year\'s Eve',
+};
+
+const SHORT = {
+  'New Year\'s Day':'New Yr','Maundy Thursday':'Maun','Good Friday':'Good Fr',
+  'Easter Sunday':'Easter','Easter Monday':'E.Mon','Ascension Day':'Ascen',
+  'Whit Sunday':'Whit','Whit Monday':'W.Mon','Christmas Day':'Xmas',
+  'Boxing Day':'Boxing','Labour Day':'Labour','Constitution Day':'Const.',
+  'Christmas Eve':'Xmas Eve','New Year\'s Eve':'NY Eve',
+};
+
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS = ['Mo','Tu','We','Th','Fr','Sa','Su'];
+
+// ── STATE ─────────────────────────────────────────────────
+let leaveData = {};
+let currentMonth = new Date().getMonth();
+let currentTab = 'month';
+let pendingRemove = null;
+
+// ── HELPERS ───────────────────────────────────────────────
+function toKey(y,m,d){ return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
+function isWE(y,m,d){ const day=new Date(y,m,d).getDay(); return day===0||day===6; }
+function isHol(k){ return !!HOLIDAYS[k]; }
+function daysIn(y,m){ return new Date(y,m+1,0).getDate(); }
+function todayStr(){ const t=new Date(); return toKey(t.getFullYear(),t.getMonth(),t.getDate()); }
+
+function isoWeek(y,m,d){
+  const dt=new Date(y,m,d);
+  const tmp=new Date(Date.UTC(dt.getFullYear(),dt.getMonth(),dt.getDate()));
+  tmp.setUTCDate(tmp.getUTCDate()+4-(tmp.getUTCDay()||7));
+  const ys=new Date(Date.UTC(tmp.getUTCFullYear(),0,1));
+  return Math.ceil((((tmp-ys)/86400000)+1)/7);
+}
+
+// ── TABS ──────────────────────────────────────────────────
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-btn')[tab==='month'?0:1].classList.add('active');
+  document.getElementById('monthView').classList.toggle('hidden', tab !== 'month');
+  document.getElementById('yearView').classList.toggle('hidden', tab !== 'year');
+  if (tab === 'year') renderYearView();
+}
+
+// ── ADD / REMOVE MEMBERS ──────────────────────────────────
+function addMember() {
+  const inp = document.getElementById('newMemberInput');
+  const name = inp.value.trim();
+  if (!name) return;
+  if (SCRUM_MASTERS.includes(name)) { showToast(`${name} is already on the list`); return; }
+  SCRUM_MASTERS.push(name);
+  inp.value = '';
+  renderCalendar();
+  if (currentTab === 'year') renderYearView();
+  autoSave();
+  showToast(`✅ ${name.split(' ')[0]} added!`);
+}
+
+function removeMember(name) {
+  pendingRemove = name;
+  document.getElementById('removeModalText').textContent = `Are you sure you want to remove ${name}?`;
+  document.getElementById('removeModal').classList.add('open');
+}
+
+function confirmRemove() {
+  if (!pendingRemove) return;
+  SCRUM_MASTERS = SCRUM_MASTERS.filter(n => n !== pendingRemove);
+  delete leaveData[pendingRemove];
+  closeModal();
+  renderCalendar();
+  if (currentTab === 'year') renderYearView();
+  autoSave();
+  showToast('🗑️ Member removed');
+}
+
+function closeModal() {
+  document.getElementById('removeModal').classList.remove('open');
+  pendingRemove = null;
+}
+
+// ── MONTHLY CALENDAR ──────────────────────────────────────
+function renderCalendar() {
+  const y=2026, m=currentMonth, days=daysIn(y,m), today=todayStr();
+  const allDays = Array.from({length:days},(_,i)=>i+1);
+
+  // Build columns with week markers
+  const cols=[];
+  let lastW=null;
+  allDays.forEach(d=>{
+    const wn=isoWeek(y,m,d);
+    if(wn!==lastW){ cols.push({type:'week',num:wn}); lastW=wn; }
+    cols.push({type:'day',d});
+  });
+
+  // HEAD
+  const head=document.getElementById('calHead');
+  head.innerHTML='';
+  const tr=document.createElement('tr');
+  const thN=document.createElement('th'); thN.className='name-col'; thN.textContent='Scrum Master';
+  tr.appendChild(thN);
+
+  cols.forEach(col=>{
+    if(col.type==='week'){
+      const th=document.createElement('th');
+      th.style.cssText='min-width:26px;max-width:26px;background:rgba(108,92,231,0.07);border-left:2px solid rgba(108,92,231,0.2);color:#6c5ce7;font-size:9px;font-weight:800;padding:4px 2px;';
+      const wl=document.createElement('div');
+      wl.style.cssText='writing-mode:vertical-rl;transform:rotate(180deg);font-size:9px;padding:3px 0;letter-spacing:0.04em;';
+      wl.textContent='W'+col.num; th.appendChild(wl); tr.appendChild(th);
+    } else {
+      const d=col.d, key=toKey(y,m,d);
+      const th=document.createElement('th'); th.className='day-header';
+      const jd=new Date(y,m,d).getDay();
+      if(jd===0||jd===6) th.classList.add('weekend');
+      if(isHol(key)) th.classList.add('holiday-header');
+      if(key===today) th.classList.add('today-header');
+      const num=document.createElement('div'); num.textContent=d; th.appendChild(num);
+      const wd=document.createElement('div');
+      wd.style.cssText='font-size:9px;opacity:0.5;';
+      wd.textContent=DAYS[jd===0?6:jd-1]; th.appendChild(wd);
+      if(isHol(key)){
+        const hl=document.createElement('div'); hl.className='holiday-label';
+        hl.textContent=SHORT[HOLIDAYS[key]]||HOLIDAYS[key].substring(0,7);
+        hl.title=HOLIDAYS[key]; th.appendChild(hl);
+      }
+      tr.appendChild(th);
+    }
+  });
+  head.appendChild(tr);
+
+  // BODY
+  const body=document.getElementById('calBody');
+  body.innerHTML='';
+
+  SCRUM_MASTERS.forEach(name=>{
+    const row=document.createElement('tr');
+    const tdN=document.createElement('td'); tdN.className='name-col';
+    const nw=document.createElement('div'); nw.className='name-wrap';
+    const sp=document.createElement('span'); sp.className='person-name'; sp.textContent=name;
+    nw.appendChild(sp);
+    if(MANAGERS.includes(name)){
+      const b=document.createElement('span'); b.className='manager-badge'; b.textContent='Mgr';
+      nw.appendChild(b);
+    }
+    const rb=document.createElement('button'); rb.className='btn-remove'; rb.textContent='✕'; rb.title='Remove '+name;
+    rb.onclick=(e)=>{e.stopPropagation();removeMember(name);};
+    nw.appendChild(rb); tdN.appendChild(nw); row.appendChild(tdN);
+
+    cols.forEach(col=>{
+      if(col.type==='week'){
+        const td=document.createElement('td');
+        td.style.cssText='background:rgba(108,92,231,0.04);border-left:2px solid rgba(108,92,231,0.12);';
+        row.appendChild(td);
+      } else {
+        const d=col.d, key=toKey(y,m,d);
+        const td=document.createElement('td');
+        const cell=document.createElement('div'); cell.className='day-cell';
+        const we=isWE(y,m,d), hol=isHol(key), onLeave=leaveData[name]&&leaveData[name][key];
+        if(we){ cell.classList.add('weekend'); }
+        else if(hol){ cell.classList.add('holiday'); cell.title=HOLIDAYS[key]; }
+        else {
+          cell.classList.add('workday');
+          if(onLeave) cell.classList.add('on-leave');
+          if(key===today) cell.classList.add('today-cell');
+          cell.onclick=()=>toggleLeave(name,key);
+        }
+        td.appendChild(cell); row.appendChild(td);
+      }
+    });
+    body.appendChild(row);
+  });
+
+  // Summary row
+  const sr=document.createElement('tr'); sr.className='summary-row';
+  const sl=document.createElement('td'); sl.className='name-col';
+  sl.innerHTML='<span style="font-size:11px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:0.1em;">Available</span>';
+  sr.appendChild(sl);
+  cols.forEach(col=>{
+    const td=document.createElement('td');
+    if(col.type==='week'){
+      td.style.cssText='background:rgba(108,92,231,0.04);border-left:2px solid rgba(108,92,231,0.12);';
+      sr.appendChild(td); return;
+    }
+    const d=col.d, key=toKey(y,m,d);
+    if(isWE(y,m,d)||isHol(key)){
+      const c=document.createElement('div'); c.className='avail-bar avail-off'; td.appendChild(c);
+    } else {
+      const total=SCRUM_MASTERS.length;
+      const gone=SCRUM_MASTERS.filter(n=>leaveData[n]&&leaveData[n][key]).length;
+      const avail=total-gone, pct=Math.round((avail/total)*100);
+      const c=document.createElement('div'); c.className='avail-bar';
+      if(pct===100) c.classList.add('avail-full');
+      else if(pct>=70) c.classList.add('avail-partial');
+      else c.classList.add('avail-none');
+      c.textContent=avail; c.title=`${avail}/${total} available`; td.appendChild(c);
+    }
+    sr.appendChild(td);
+  });
+  body.appendChild(sr);
+  updateStats();
+}
+
+// ── YEAR OVERVIEW ─────────────────────────────────────────
+function renderYearView() {
+  const y=2026, today=todayStr();
+  const grid=document.getElementById('yearGrid');
+  grid.innerHTML='';
+
+  // Year stats
+  let totalLeave=0;
+  SCRUM_MASTERS.forEach(n=>{ if(leaveData[n]) totalLeave+=Object.keys(leaveData[n]).length; });
+  document.getElementById('yStat1').textContent=SCRUM_MASTERS.length;
+  document.getElementById('yStat2').textContent=totalLeave;
+
+  for(let m=0; m<12; m++){
+    const days=daysIn(y,m);
+    const allDays=Array.from({length:days},(_,i)=>i+1);
+
+    const card=document.createElement('div'); card.className='mini-month';
+
+    // Month title + leave count
+    const leaveThisMonth = (() => {
+      let count=0;
+      allDays.forEach(d=>{
+        const key=toKey(y,m,d);
+        if(!isWE(y,m,d)&&!isHol(key)){
+          SCRUM_MASTERS.forEach(n=>{ if(leaveData[n]&&leaveData[n][key]) count++; });
+        }
+      });
+      return count;
+    })();
+
+    const title=document.createElement('div'); title.className='mini-month-title';
+    title.innerHTML=`<span>${MONTHS[m]}</span><span>${leaveThisMonth>0?leaveThisMonth+' leave days':''}</span>`;
+    card.appendChild(title);
+
+    const wrap=document.createElement('div'); wrap.style.overflowX='auto';
+    const tbl=document.createElement('table'); tbl.className='mini-table';
+
+    // Header row
+    const thead=document.createElement('thead');
+    const htr=document.createElement('tr');
+    const thN=document.createElement('th'); thN.className='name-th'; thN.textContent='Member';
+    htr.appendChild(thN);
+    allDays.forEach(d=>{
+      const th=document.createElement('th');
+      const jd=new Date(y,m,d).getDay();
+      const key=toKey(y,m,d);
+      th.textContent=d;
+      th.style.minWidth='16px';
+      if(jd===0||jd===6) th.style.color='#c0c8e0';
+      if(isHol(key)) th.style.color='var(--holiday)';
+      if(key===today) th.style.color='var(--teal)';
+      htr.appendChild(th);
+    });
+    thead.appendChild(htr);
+    tbl.appendChild(thead);
+
+    // Body
+    const tbody=document.createElement('tbody');
+    SCRUM_MASTERS.forEach(name=>{
+      const row=document.createElement('tr');
+      const tdN=document.createElement('td'); tdN.className='name-td';
+      tdN.textContent=name.split(' ')[0]; // first name only in mini view
+      tdN.title=name;
+      row.appendChild(tdN);
+      allDays.forEach(d=>{
+        const key=toKey(y,m,d);
+        const td=document.createElement('td');
+        const cell=document.createElement('div'); cell.className='mini-cell';
+        const we=isWE(y,m,d), hol=isHol(key), onLeave=leaveData[name]&&leaveData[name][key];
+        if(we){ cell.classList.add('weekend'); }
+        else if(hol){ cell.classList.add('holiday'); cell.title=HOLIDAYS[key]; }
+        else {
+          cell.classList.add('workday');
+          if(onLeave) cell.classList.add('on-leave');
+          if(key===today) cell.classList.add('today-mini');
+          cell.onclick=()=>{ toggleLeave(name,key); renderYearView(); };
+        }
+        td.appendChild(cell); row.appendChild(td);
+      });
+      tbody.appendChild(row);
+    });
+
+    // Mini availability row
+    const avRow=document.createElement('tr'); avRow.className='mini-avail-row';
+    const avLabel=document.createElement('td'); avLabel.className='name-td';
+    avLabel.style.cssText='font-size:8px;color:var(--muted);font-weight:800;text-transform:uppercase;';
+    avLabel.textContent='Avail.'; avRow.appendChild(avLabel);
+
+    allDays.forEach(d=>{
+      const key=toKey(y,m,d);
+      const td=document.createElement('td');
+      if(isWE(y,m,d)||isHol(key)){
+        const c=document.createElement('div'); c.className='mini-avail off'; td.appendChild(c);
+      } else {
+        const total=SCRUM_MASTERS.length;
+        const gone=SCRUM_MASTERS.filter(n=>leaveData[n]&&leaveData[n][key]).length;
+        const avail=total-gone, pct=Math.round((avail/total)*100);
+        const c=document.createElement('div'); c.className='mini-avail';
+        if(pct===100) c.classList.add('full');
+        else if(pct>=70) c.classList.add('partial');
+        else c.classList.add('low');
+        c.textContent=avail; c.title=`${avail}/${total}`; td.appendChild(c);
+      }
+      avRow.appendChild(td);
+    });
+    tbody.appendChild(avRow);
+
+    tbl.appendChild(tbody);
+    wrap.appendChild(tbl);
+    card.appendChild(wrap);
+    grid.appendChild(card);
+  }
+}
+
+function toggleLeave(name,dateKey) {
+  if(!leaveData[name]) leaveData[name]={};
+  if(leaveData[name][dateKey]){
+    delete leaveData[name][dateKey];
+    showToast(`${name.split(' ')[0]} — leave removed`);
+  } else {
+    leaveData[name][dateKey]=true;
+    showToast(`✈ ${name.split(' ')[0]} — marked as away`);
+  }
+  renderCalendar();
+  autoSave();
+}
+
+function updateStats() {
+  const today=todayStr();
+  const gone=SCRUM_MASTERS.filter(n=>leaveData[n]&&leaveData[n][today]).length;
+  document.getElementById('statTotal').textContent=SCRUM_MASTERS.length;
+  document.getElementById('statLeave').textContent=gone;
+  document.getElementById('statAvail').textContent=SCRUM_MASTERS.length-gone;
+  document.getElementById('statMonth').textContent=MONTHS[currentMonth];
+}
+
+function buildMonthNav() {
+  const nav=document.getElementById('monthNav'); nav.innerHTML='';
+  MONTHS.forEach((name,i)=>{
+    const btn=document.createElement('button');
+    btn.className='month-btn'+(i===currentMonth?' active':'');
+    btn.textContent=name;
+    btn.onclick=()=>{
+      currentMonth=i;
+      document.querySelectorAll('.month-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      renderCalendar();
+    };
+    nav.appendChild(btn);
+  });
+}
+
+// ── SYNC ──────────────────────────────────────────────────
+let autoSaveTimer=null;
+function autoSave(){ clearTimeout(autoSaveTimer); autoSaveTimer=setTimeout(saveToSheets,3000); }
+
+async function saveToSheets() {
+  setSyncStatus('saving');
+  try {
+    const res=await fetch(PROXY_URL,{method:'POST',body:JSON.stringify({action:'save',data:{leaveData,members:SCRUM_MASTERS}})});
+    const json=await res.json();
+    if(json.ok){ setSyncStatus('ok'); localStorage.setItem('smcal',JSON.stringify({leaveData,members:SCRUM_MASTERS})); showToast('💾 Saved ✓'); }
+    else setSyncStatus('error');
+  } catch(e){ setSyncStatus('error'); showToast('Save failed — try again'); }
+}
+
+async function loadFromSheets() {
+  setSyncStatus('loading');
+  try {
+    const res=await fetch(PROXY_URL,{method:'POST',body:JSON.stringify({action:'load'})});
+    const json=await res.json();
+    if(json.ok&&json.data){
+      if(json.data.leaveData) leaveData=json.data.leaveData;
+      if(json.data.members&&json.data.members.length>0) SCRUM_MASTERS=json.data.members;
+      localStorage.setItem('smcal',JSON.stringify({leaveData,members:SCRUM_MASTERS}));
+      renderCalendar(); setSyncStatus('ok'); showToast('✓ Loaded from Google Sheets');
+    } else setSyncStatus('ok');
+  } catch(e){
+    const c=localStorage.getItem('smcal');
+    if(c){ const d=JSON.parse(c); if(d.leaveData) leaveData=d.leaveData; if(d.members&&d.members.length>0) SCRUM_MASTERS=d.members; }
+    setSyncStatus('error'); renderCalendar();
+  }
+}
+
+function setSyncStatus(state) {
+  const dot=document.getElementById('syncDot'), label=document.getElementById('syncLabel');
+  const map={ok:['#55efc4','Synced '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})],saving:['#fdcb6e','Saving...'],loading:['#74b9ff','Loading...'],error:['#ff7675','Offline']};
+  dot.style.background=map[state][0]; label.textContent=map[state][1];
+}
+
+let toastTimer=null;
+function showToast(msg){
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ── INIT ──────────────────────────────────────────────────
+buildMonthNav();
+renderCalendar();
+loadFromSheets();
+</script>
+</body>
+</html>
