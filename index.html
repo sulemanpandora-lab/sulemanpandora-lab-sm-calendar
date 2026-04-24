@@ -896,33 +896,32 @@ function autoSave(){ clearTimeout(autoSaveTimer); autoSaveTimer=setTimeout(saveT
 async function saveToSheets() {
   setSyncStatus('saving');
   try {
-    const res=await fetch(PROXY_URL, {
-      method:'POST',
-      mode:'no-cors',
-      body:JSON.stringify({action:'save',data:{leaveData,members:SCRUM_MASTERS}})
-    });
-    // no-cors means we can't read response — assume ok
-    setSyncStatus('ok');
-    localStorage.setItem('smcal',JSON.stringify({leaveData,members:SCRUM_MASTERS}));
-    showToast('💾 Saved ✓');
+    const payload = encodeURIComponent(JSON.stringify({leaveData, members:SCRUM_MASTERS}));
+    const url = PROXY_URL + '?action=save&data=' + payload;
+    const res = await fetch(url, { method:'GET' });
+    const json = await res.json();
+    if(json.ok){
+      setSyncStatus('ok');
+      localStorage.setItem('smcal', JSON.stringify({leaveData, members:SCRUM_MASTERS}));
+      showToast('💾 Saved ✓');
+    } else { setSyncStatus('error'); showToast('Save failed'); }
   } catch(e){ setSyncStatus('error'); showToast('Save failed — try again'); }
 }
 
 async function loadFromSheets() {
   setSyncStatus('loading');
-  // Load uses a GET with data in URL params to work around CORS
   try {
     const url = PROXY_URL + '?action=load';
     const res = await fetch(url, { method:'GET' });
     const json = await res.json();
-    if(json.ok&&json.data){
-      if(json.data.leaveData) leaveData=json.data.leaveData;
-      if(json.data.members&&json.data.members.length>0) SCRUM_MASTERS=json.data.members;
-      localStorage.setItem('smcal',JSON.stringify({leaveData,members:SCRUM_MASTERS}));
+    if(json.ok && json.data){
+      if(json.data.leaveData) leaveData = json.data.leaveData;
+      if(json.data.members && json.data.members.length>0) SCRUM_MASTERS = json.data.members;
+      localStorage.setItem('smcal', JSON.stringify({leaveData, members:SCRUM_MASTERS}));
       renderCalendar(); setSyncStatus('ok'); showToast('✓ Loaded from Google Sheets');
     } else { setSyncStatus('ok'); renderCalendar(); }
   } catch(e){
-    const c=localStorage.getItem('smcal');
+    const c = localStorage.getItem('smcal');
     if(c){ const d=JSON.parse(c); if(d.leaveData) leaveData=d.leaveData; if(d.members&&d.members.length>0) SCRUM_MASTERS=d.members; }
     setSyncStatus('error'); renderCalendar();
   }
