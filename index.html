@@ -424,11 +424,11 @@
       <div class="stat-value purple" id="statTotal">19</div>
     </div>
     <div class="stat">
-      <div class="stat-label">On Leave Today</div>
+      <div class="stat-label">On Leave This Month</div>
       <div class="stat-value coral" id="statLeave">0</div>
     </div>
     <div class="stat">
-      <div class="stat-label">Available Today</div>
+      <div class="stat-label">Available This Month</div>
       <div class="stat-value green" id="statAvail">19</div>
     </div>
     <div class="stat">
@@ -857,11 +857,19 @@ function toggleLeave(name,dateKey) {
 }
 
 function updateStats() {
-  const today=todayStr();
-  const gone=SCRUM_MASTERS.filter(n=>leaveData[n]&&leaveData[n][today]).length;
+  const y=2026, m=currentMonth, days=daysIn(y,m);
+  // Count unique members who have at least one leave day this month
+  const onLeave = SCRUM_MASTERS.filter(n => {
+    if (!leaveData[n]) return false;
+    for (let d=1; d<=days; d++) {
+      const key = toKey(y,m,d);
+      if (!isWE(y,m,d) && !isHol(key) && leaveData[n][key]) return true;
+    }
+    return false;
+  }).length;
   document.getElementById('statTotal').textContent=SCRUM_MASTERS.length;
-  document.getElementById('statLeave').textContent=gone;
-  document.getElementById('statAvail').textContent=SCRUM_MASTERS.length-gone;
+  document.getElementById('statLeave').textContent=onLeave;
+  document.getElementById('statAvail').textContent=SCRUM_MASTERS.length-onLeave;
   document.getElementById('statMonth').textContent=MONTHS[currentMonth];
 }
 
