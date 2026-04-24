@@ -400,11 +400,9 @@
   </div>
   <div class="header-right">
     <div class="sync-status">
-      <div class="sync-dot" id="syncDot"></div>
-      <span id="syncLabel">Loading...</span>
+      <div class="sync-dot" style="background:#55efc4"></div>
+      <span style="font-size:11px;color:rgba(255,255,255,0.85);font-family:'DM Mono',monospace;">Auto-saved locally</span>
     </div>
-    <button class="btn" onclick="loadFromSheets()">⟳ Load</button>
-    <button class="btn btn-white" onclick="saveToSheets()">💾 Save</button>
   </div>
 </header>
 
@@ -891,55 +889,12 @@ function buildMonthNav() {
 
 // ── SYNC ──────────────────────────────────────────────────
 let autoSaveTimer=null;
-function autoSave(){ clearTimeout(autoSaveTimer); autoSaveTimer=setTimeout(saveToSheets,3000); }
-
-function jsonp(url) {
-  return new Promise((resolve, reject) => {
-    const cb = 'cb_' + Date.now();
-    const script = document.createElement('script');
-    window[cb] = (data) => { delete window[cb]; document.body.removeChild(script); resolve(data); };
-    script.onerror = () => { delete window[cb]; document.body.removeChild(script); reject(); };
-    script.src = url + '&callback=' + cb;
-    document.body.appendChild(script);
-  });
-}
-
-async function saveToSheets() {
-  setSyncStatus('saving');
-  try {
-    fetch(PROXY_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ action: 'save', data: { leaveData, members: SCRUM_MASTERS } })
-    });
+function autoSave(){
+  clearTimeout(autoSaveTimer);
+  autoSaveTimer=setTimeout(()=>{
     localStorage.setItem('smcal', JSON.stringify({leaveData, members:SCRUM_MASTERS}));
-    setSyncStatus('ok');
-    showToast('💾 Saved ✓');
-  } catch(e) { setSyncStatus('error'); showToast('Save failed — try again'); }
-}
-
-async function loadFromSheets() {
-  setSyncStatus('loading');
-  try {
-    const json = await jsonp(PROXY_URL + '?action=load');
-    if(json.ok && json.data){
-      if(json.data.leaveData) leaveData = json.data.leaveData;
-      if(json.data.members && json.data.members.length>0) SCRUM_MASTERS = json.data.members;
-      localStorage.setItem('smcal', JSON.stringify({leaveData, members:SCRUM_MASTERS}));
-      renderCalendar(); setSyncStatus('ok'); showToast('✓ Loaded from Google Sheets');
-    } else { setSyncStatus('ok'); renderCalendar(); }
-  } catch(e){
-    const c = localStorage.getItem('smcal');
-    if(c){ const d=JSON.parse(c); if(d.leaveData) leaveData=d.leaveData; if(d.members&&d.members.length>0) SCRUM_MASTERS=d.members; }
-    setSyncStatus('error'); renderCalendar();
-  }
-}
-
-function setSyncStatus(state) {
-  const dot=document.getElementById('syncDot'), label=document.getElementById('syncLabel');
-  const map={ok:['#55efc4','Synced '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})],saving:['#fdcb6e','Saving...'],loading:['#74b9ff','Loading...'],error:['#ff7675','Offline']};
-  dot.style.background=map[state][0]; label.textContent=map[state][1];
+    showToast('💾 Saved locally ✓');
+  }, 1000);
 }
 
 let toastTimer=null;
@@ -949,9 +904,17 @@ function showToast(msg){
 }
 
 // ── INIT ──────────────────────────────────────────────────
+// Load from localStorage on start
+const _cached = localStorage.getItem('smcal');
+if (_cached) {
+  try {
+    const _d = JSON.parse(_cached);
+    if (_d.leaveData) leaveData = _d.leaveData;
+    if (_d.members && _d.members.length > 0) SCRUM_MASTERS = _d.members;
+  } catch(e) {}
+}
 buildMonthNav();
 renderCalendar();
-loadFromSheets();
 </script>
 </body>
 </html>
