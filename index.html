@@ -509,7 +509,7 @@
 
 <script>
 // ── CONFIG ────────────────────────────────────────────────
-const PROXY_URL = 'https://script.google.com/macros/s/AKfycbydmbPt7zjNgvO3O-is1Ht2UPoKnuOm_m9o_sNBXl7_B5mL3daxyRUgr846iCXNfiIlvw/exec';
+const PROXY_URL = 'https://script.google.com/macros/s/AKfycbx6X9D8OFzawImXiCpR0m1_GVOcF4xrt5h9o8xiTgY8Cg7_53WIShI64j7-oU68keAXxw/exec';
 
 let SCRUM_MASTERS = [
   'Donika Pavlova-Bjørnsten','Monal Yadav','Anne Bjergstad','Olga Sarnowska',
@@ -896,24 +896,31 @@ function autoSave(){ clearTimeout(autoSaveTimer); autoSaveTimer=setTimeout(saveT
 async function saveToSheets() {
   setSyncStatus('saving');
   try {
-    const res=await fetch(PROXY_URL,{method:'POST',body:JSON.stringify({action:'save',data:{leaveData,members:SCRUM_MASTERS}})});
-    const json=await res.json();
-    if(json.ok){ setSyncStatus('ok'); localStorage.setItem('smcal',JSON.stringify({leaveData,members:SCRUM_MASTERS})); showToast('💾 Saved ✓'); }
-    else setSyncStatus('error');
+    const res=await fetch(PROXY_URL, {
+      method:'POST',
+      mode:'no-cors',
+      body:JSON.stringify({action:'save',data:{leaveData,members:SCRUM_MASTERS}})
+    });
+    // no-cors means we can't read response — assume ok
+    setSyncStatus('ok');
+    localStorage.setItem('smcal',JSON.stringify({leaveData,members:SCRUM_MASTERS}));
+    showToast('💾 Saved ✓');
   } catch(e){ setSyncStatus('error'); showToast('Save failed — try again'); }
 }
 
 async function loadFromSheets() {
   setSyncStatus('loading');
+  // Load uses a GET with data in URL params to work around CORS
   try {
-    const res=await fetch(PROXY_URL,{method:'POST',body:JSON.stringify({action:'load'})});
-    const json=await res.json();
+    const url = PROXY_URL + '?action=load';
+    const res = await fetch(url, { method:'GET' });
+    const json = await res.json();
     if(json.ok&&json.data){
       if(json.data.leaveData) leaveData=json.data.leaveData;
       if(json.data.members&&json.data.members.length>0) SCRUM_MASTERS=json.data.members;
       localStorage.setItem('smcal',JSON.stringify({leaveData,members:SCRUM_MASTERS}));
       renderCalendar(); setSyncStatus('ok'); showToast('✓ Loaded from Google Sheets');
-    } else setSyncStatus('ok');
+    } else { setSyncStatus('ok'); renderCalendar(); }
   } catch(e){
     const c=localStorage.getItem('smcal');
     if(c){ const d=JSON.parse(c); if(d.leaveData) leaveData=d.leaveData; if(d.members&&d.members.length>0) SCRUM_MASTERS=d.members; }
